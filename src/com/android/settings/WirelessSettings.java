@@ -48,12 +48,13 @@ public class WirelessSettings extends PreferenceActivity {
     private static final String KEY_PROXY_SETTING = "proxy_setting";
     public static final String EXIT_ECM_RESULT = "exit_ecm_result";
     public static final int REQUEST_CODE_EXIT_ECM = 1;
+    private static final String KEY_TOGGLE_MULTILINK = "toggle_multilink";
 
     private AirplaneModeEnabler mAirplaneModeEnabler;
     private CheckBoxPreference mAirplaneModePreference;
     private WifiEnabler mWifiEnabler;
     private BluetoothEnabler mBtEnabler;
-
+    private MultiLinkEnabler mMultiLinkEnabler;
     /**
      * Invoked on each preference click in this hierarchy, overrides
      * PreferenceActivity's implementation.  Used to make sure we track the
@@ -97,6 +98,9 @@ public class WirelessSettings extends PreferenceActivity {
         mAirplaneModePreference = (CheckBoxPreference) findPreference(KEY_TOGGLE_AIRPLANE);
         mWifiEnabler = new WifiEnabler(this, wifi);
         mBtEnabler = new BluetoothEnabler(this, bt);
+
+	mMultiLinkEnabler = new MultiLinkEnabler(this,
+                (CheckBoxPreference) findPreference(KEY_TOGGLE_MULTILINK));
 
         String toggleable = Settings.System.getString(getContentResolver(),
                 Settings.System.AIRPLANE_MODE_TOGGLEABLE_RADIOS);
@@ -146,7 +150,7 @@ public class WirelessSettings extends PreferenceActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        
+        mMultiLinkEnabler.resume(); 
         mAirplaneModeEnabler.resume();
         mWifiEnabler.resume();
         mBtEnabler.resume();
@@ -155,7 +159,7 @@ public class WirelessSettings extends PreferenceActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        
+	mMultiLinkEnabler.pause();        
         mAirplaneModeEnabler.pause();
         mWifiEnabler.pause();
         mBtEnabler.pause();

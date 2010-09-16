@@ -2679,5 +2679,11 @@ found in the list of installed applications.</string>
     <string name="proxy_setting">Proxy settings</string>
     <string name="proxy_setting_summary">Configure a proxy to access the internet</string>
     <string name="proxy_wifi_on">Enable proxy on wifi</string>
+	
+    <string name="multilink_summary">toggle multilink mode</string>
+    <string name="multilink_turning_on">Turning multilink mode on</string>
+    <string name="multilink_turning_off">Turning multilink mode off</string>
+    <string name="multilink">Multilink</string>
+
 
 </resources>
