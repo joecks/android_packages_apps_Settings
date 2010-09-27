@@ -81,7 +81,7 @@ public class MultiLinkEnabler implements Preference.OnPreferenceChangeListener {
 
     private void setMultiLinkModeOn(boolean enabling) {
         
-        mCheckBoxPref.setEnabled(false);
+    //    mCheckBoxPref.setEnabled(false);
         mCheckBoxPref.setSummary(enabling ? R.string.multilink_turning_on
                 : R.string.multilink_turning_off);
         
@@ -89,11 +89,6 @@ public class MultiLinkEnabler implements Preference.OnPreferenceChangeListener {
         Settings.System.putInt(mContext.getContentResolver(), Settings.System.MULTILINK_ON, 
                                 enabling ? 1 : 0);
         
-       //Its not nessary for now
-        // Post the intent
-       // Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
-       // intent.putExtra("state", enabling);
-       // mContext.sendBroadcast(intent);
     }
 
     /**
