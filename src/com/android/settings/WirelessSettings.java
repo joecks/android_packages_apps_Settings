@@ -46,13 +46,18 @@ public class WirelessSettings extends PreferenceActivity {
     private static final String KEY_PROXY_SETTING = "proxy_setting";
     public static final String EXIT_ECM_RESULT = "exit_ecm_result";
     public static final int REQUEST_CODE_EXIT_ECM = 1;
+    private static final String KEY_TOGGLE_MULTILINK = "toggle_multilink";
 
     private WifiEnabler mWifiEnabler;
     private AirplaneModeEnabler mAirplaneModeEnabler;
     private BluetoothEnabler mBtEnabler;
+<<<<<<< HEAD:src/com/android/settings/WirelessSettings.java
     private CheckBoxPreference mAirplaneModePreference;
     private TetheringEnabler mTetheringEnabler;
 
+=======
+    private MultiLinkEnabler mMultiLinkEnabler;
+>>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:src/com/android/settings/WirelessSettings.java
     /**
      * Invoked on each preference click in this hierarchy, overrides
      * PreferenceActivity's implementation.  Used to make sure we track the
@@ -84,12 +89,69 @@ public class WirelessSettings extends PreferenceActivity {
 
         initToggles();
         mAirplaneModePreference = (CheckBoxPreference) findPreference(KEY_TOGGLE_AIRPLANE);
+<<<<<<< HEAD:src/com/android/settings/WirelessSettings.java
+=======
+        mWifiEnabler = new WifiEnabler(this, wifi);
+        mBtEnabler = new BluetoothEnabler(this, bt);
+
+	mMultiLinkEnabler = new MultiLinkEnabler(this,
+                (CheckBoxPreference) findPreference(KEY_TOGGLE_MULTILINK));
+
+        String toggleable = Settings.System.getString(getContentResolver(),
+                Settings.System.AIRPLANE_MODE_TOGGLEABLE_RADIOS);
+
+        // Manually set dependencies for Wifi when not toggleable.
+        if (toggleable == null || !toggleable.contains(Settings.System.RADIO_WIFI)) {
+            wifi.setDependency(KEY_TOGGLE_AIRPLANE);
+            findPreference(KEY_WIFI_SETTINGS).setDependency(KEY_TOGGLE_AIRPLANE);
+            findPreference(KEY_VPN_SETTINGS).setDependency(KEY_TOGGLE_AIRPLANE);
+        }
+
+        // Manually set dependencies for Bluetooth when not toggleable.
+        if (toggleable == null || !toggleable.contains(Settings.System.RADIO_BLUETOOTH)) {
+            bt.setDependency(KEY_TOGGLE_AIRPLANE);
+            findPreference(KEY_BT_SETTINGS).setDependency(KEY_TOGGLE_AIRPLANE);
+        }
+
+        // Disable Bluetooth Settings if Bluetooth service is not available.
+        if (ServiceManager.getService(BluetoothAdapter.BLUETOOTH_SERVICE) == null) {
+            findPreference(KEY_BT_SETTINGS).setEnabled(false);
+        }
+
+        // Disable Tethering if it's not allowed
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (!cm.isTetheringSupported()) {
+            getPreferenceScreen().removePreference(findPreference(KEY_TETHER_SETTINGS));
+        } else {
+            String[] usbRegexs = cm.getTetherableUsbRegexs();
+            String[] wifiRegexs = cm.getTetherableWifiRegexs();
+            Preference p = findPreference(KEY_TETHER_SETTINGS);
+            if (wifiRegexs.length == 0) {
+                p.setTitle(R.string.tether_settings_title_usb);
+                p.setSummary(R.string.tether_settings_summary_usb);
+            } else {
+                if (usbRegexs.length == 0) {
+                    p.setTitle(R.string.tether_settings_title_wifi);
+                    p.setSummary(R.string.tether_settings_summary_wifi);
+                } else {
+                    p.setTitle(R.string.tether_settings_title_both);
+                    p.setSummary(R.string.tether_settings_summary_both);
+                }
+            }
+        }
+>>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:src/com/android/settings/WirelessSettings.java
     }
     
     @Override
     protected void onResume() {
         super.onResume();
+<<<<<<< HEAD:src/com/android/settings/WirelessSettings.java
         
+=======
+        mMultiLinkEnabler.resume(); 
+        mAirplaneModeEnabler.resume();
+>>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:src/com/android/settings/WirelessSettings.java
         mWifiEnabler.resume();
         mBtEnabler.resume();
         mAirplaneModeEnabler.resume();
@@ -99,7 +161,12 @@ public class WirelessSettings extends PreferenceActivity {
     @Override
     protected void onPause() {
         super.onPause();
+<<<<<<< HEAD:src/com/android/settings/WirelessSettings.java
         
+=======
+	mMultiLinkEnabler.pause();        
+        mAirplaneModeEnabler.pause();
+>>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:src/com/android/settings/WirelessSettings.java
         mWifiEnabler.pause();
         mAirplaneModeEnabler.pause();
         mBtEnabler.pause();

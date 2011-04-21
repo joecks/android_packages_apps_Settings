@@ -92,4 +92,11 @@
             android:targetClass="com.android.settings.ProxySelector" />
     </PreferenceScreen>
 
+    <CheckBoxPreference
+           android:key="toggle_multilink"
+           android:title="@string/multilink"
+           android:summary="@string/multilink_summary"
+           android:persistent="true"
+           android:disableDependentsState="true" />
+
 </PreferenceScreen>

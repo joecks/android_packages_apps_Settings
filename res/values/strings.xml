@@ -2309,7 +2309,17 @@ found in the list of installed applications.</string>
     <!-- Proxy settings -->
     <string name="proxy_setting">Proxy settings</string>
     <string name="proxy_setting_summary">Configure a proxy to access the internet</string>
+<<<<<<< HEAD:res/values/strings.xml
     <string name="proxy_wifi_only">Use proxy only on wifi</string>
+=======
+    <string name="proxy_wifi_on">Enable proxy on wifi</string>
+	
+    <string name="multilink_summary">toggle multilink mode</string>
+    <string name="multilink_turning_on">Turning multilink mode on</string>
+    <string name="multilink_turning_off">Turning multilink mode off</string>
+    <string name="multilink">Multilink</string>
+
+>>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:res/values/strings.xml
 
 	<string name="spare_settings_title">Spare Parts</string>
 	<string name="launcher_settings_title">ADWLauncher</string>
