@@ -36,194 +36,130 @@ import com.android.settings.wifi.WifiEnabler;
 
 public class WirelessSettings extends PreferenceActivity {
 
-    private static final String KEY_TOGGLE_AIRPLANE = "toggle_airplane";
-    private static final String KEY_TOGGLE_BLUETOOTH = "toggle_bluetooth";
-    private static final String KEY_TOGGLE_WIFI = "toggle_wifi";
-    private static final String KEY_WIFI_SETTINGS = "wifi_settings";
-    private static final String KEY_BT_SETTINGS = "bt_settings";
-    private static final String KEY_VPN_SETTINGS = "vpn_settings";
-    private static final String KEY_TOGGLE_TETHERING = "toggle_tethering";
-    private static final String KEY_PROXY_SETTING = "proxy_setting";
-    public static final String EXIT_ECM_RESULT = "exit_ecm_result";
-    public static final int REQUEST_CODE_EXIT_ECM = 1;
-    private static final String KEY_TOGGLE_MULTILINK = "toggle_multilink";
+	private static final String KEY_TOGGLE_MULTILINK = "toggle_multilink";
+	private static final String KEY_TOGGLE_AIRPLANE = "toggle_airplane";
+	private static final String KEY_TOGGLE_BLUETOOTH = "toggle_bluetooth";
+	private static final String KEY_TOGGLE_WIFI = "toggle_wifi";
+	private static final String KEY_WIFI_SETTINGS = "wifi_settings";
+	private static final String KEY_BT_SETTINGS = "bt_settings";
+	private static final String KEY_VPN_SETTINGS = "vpn_settings";
+	public static final String EXIT_ECM_RESULT = "exit_ecm_result";
+	public static final int REQUEST_CODE_EXIT_ECM = 1;
 
-    private WifiEnabler mWifiEnabler;
-    private AirplaneModeEnabler mAirplaneModeEnabler;
-    private BluetoothEnabler mBtEnabler;
-<<<<<<< HEAD:src/com/android/settings/WirelessSettings.java
-    private CheckBoxPreference mAirplaneModePreference;
-    private TetheringEnabler mTetheringEnabler;
+	private WifiEnabler mWifiEnabler;
+	private AirplaneModeEnabler mAirplaneModeEnabler;
+	private BluetoothEnabler mBtEnabler;
+	private CheckBoxPreference mAirplaneModePreference;
+	private MultiLinkEnabler mMultiLinkEnabler;
 
-=======
-    private MultiLinkEnabler mMultiLinkEnabler;
->>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:src/com/android/settings/WirelessSettings.java
-    /**
-     * Invoked on each preference click in this hierarchy, overrides
-     * PreferenceActivity's implementation.  Used to make sure we track the
-     * preference click events.
-     */
-    @Override
-    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-        if ( (preference == mAirplaneModePreference) &&
-                (Boolean.parseBoolean(
-                    SystemProperties.get(TelephonyProperties.PROPERTY_INECM_MODE))) ) {
-            // In ECM mode launch ECM app dialog
-            startActivityForResult(
-                new Intent(TelephonyIntents.ACTION_SHOW_NOTICE_ECM_BLOCK_OTHERS, null),
-                REQUEST_CODE_EXIT_ECM);
+	/**
+	 * Invoked on each preference click in this hierarchy, overrides
+	 * PreferenceActivity's implementation. Used to make sure we track the
+	 * preference click events.
+	 */
+	@Override
+	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
+			Preference preference) {
+		if ((preference == mAirplaneModePreference)
+				&& (Boolean.parseBoolean(SystemProperties
+						.get(TelephonyProperties.PROPERTY_INECM_MODE)))) {
+			// In ECM mode launch ECM app dialog
+			startActivityForResult(
+					new Intent(
+							TelephonyIntents.ACTION_SHOW_NOTICE_ECM_BLOCK_OTHERS,
+							null), REQUEST_CODE_EXIT_ECM);
 
-            return true;
-        }
-        else {
-            // Let the intents be launched by the Preference manager
-            return false;
-        }
-    }
-    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+			return true;
+		} else {
+			// Let the intents be launched by the Preference manager
+			return false;
+		}
+	}
 
-        addPreferencesFromResource(R.xml.wireless_settings);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-        initToggles();
-        mAirplaneModePreference = (CheckBoxPreference) findPreference(KEY_TOGGLE_AIRPLANE);
-<<<<<<< HEAD:src/com/android/settings/WirelessSettings.java
-=======
-        mWifiEnabler = new WifiEnabler(this, wifi);
-        mBtEnabler = new BluetoothEnabler(this, bt);
+		addPreferencesFromResource(R.xml.wireless_settings);
 
-	mMultiLinkEnabler = new MultiLinkEnabler(this,
-                (CheckBoxPreference) findPreference(KEY_TOGGLE_MULTILINK));
+		initToggles();
+		mAirplaneModePreference = (CheckBoxPreference) findPreference(KEY_TOGGLE_AIRPLANE);
+	}
 
-        String toggleable = Settings.System.getString(getContentResolver(),
-                Settings.System.AIRPLANE_MODE_TOGGLEABLE_RADIOS);
+	@Override
+	protected void onResume() {
+		super.onResume();
 
-        // Manually set dependencies for Wifi when not toggleable.
-        if (toggleable == null || !toggleable.contains(Settings.System.RADIO_WIFI)) {
-            wifi.setDependency(KEY_TOGGLE_AIRPLANE);
-            findPreference(KEY_WIFI_SETTINGS).setDependency(KEY_TOGGLE_AIRPLANE);
-            findPreference(KEY_VPN_SETTINGS).setDependency(KEY_TOGGLE_AIRPLANE);
-        }
+		mMultiLinkEnabler.resume();
+		mWifiEnabler.resume();
+		mBtEnabler.resume();
+		mAirplaneModeEnabler.resume();
+	}
 
-        // Manually set dependencies for Bluetooth when not toggleable.
-        if (toggleable == null || !toggleable.contains(Settings.System.RADIO_BLUETOOTH)) {
-            bt.setDependency(KEY_TOGGLE_AIRPLANE);
-            findPreference(KEY_BT_SETTINGS).setDependency(KEY_TOGGLE_AIRPLANE);
-        }
+	@Override
+	protected void onPause() {
+		super.onPause();
 
-        // Disable Bluetooth Settings if Bluetooth service is not available.
-        if (ServiceManager.getService(BluetoothAdapter.BLUETOOTH_SERVICE) == null) {
-            findPreference(KEY_BT_SETTINGS).setEnabled(false);
-        }
+		mMultiLinkEnabler.pause();
+		mWifiEnabler.pause();
+		mAirplaneModeEnabler.pause();
+		mBtEnabler.pause();
+	}
 
-        // Disable Tethering if it's not allowed
-        ConnectivityManager cm =
-                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (!cm.isTetheringSupported()) {
-            getPreferenceScreen().removePreference(findPreference(KEY_TETHER_SETTINGS));
-        } else {
-            String[] usbRegexs = cm.getTetherableUsbRegexs();
-            String[] wifiRegexs = cm.getTetherableWifiRegexs();
-            Preference p = findPreference(KEY_TETHER_SETTINGS);
-            if (wifiRegexs.length == 0) {
-                p.setTitle(R.string.tether_settings_title_usb);
-                p.setSummary(R.string.tether_settings_summary_usb);
-            } else {
-                if (usbRegexs.length == 0) {
-                    p.setTitle(R.string.tether_settings_title_wifi);
-                    p.setSummary(R.string.tether_settings_summary_wifi);
-                } else {
-                    p.setTitle(R.string.tether_settings_title_both);
-                    p.setSummary(R.string.tether_settings_summary_both);
-                }
-            }
-        }
->>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:src/com/android/settings/WirelessSettings.java
-    }
-    
-    @Override
-    protected void onResume() {
-        super.onResume();
-<<<<<<< HEAD:src/com/android/settings/WirelessSettings.java
-        
-=======
-        mMultiLinkEnabler.resume(); 
-        mAirplaneModeEnabler.resume();
->>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:src/com/android/settings/WirelessSettings.java
-        mWifiEnabler.resume();
-        mBtEnabler.resume();
-        mAirplaneModeEnabler.resume();
-        mTetheringEnabler.resume();
-    }
-    
-    @Override
-    protected void onPause() {
-        super.onPause();
-<<<<<<< HEAD:src/com/android/settings/WirelessSettings.java
-        
-=======
-	mMultiLinkEnabler.pause();        
-        mAirplaneModeEnabler.pause();
->>>>>>> 3e4a0a2... Added the Enable MultiLink preference to the wifi setting:src/com/android/settings/WirelessSettings.java
-        mWifiEnabler.pause();
-        mAirplaneModeEnabler.pause();
-        mBtEnabler.pause();
-        mTetheringEnabler.pause();
-    }
-    
-    private void initToggles() {
-        
-        Preference airplanePreference = findPreference(KEY_TOGGLE_AIRPLANE);
-        Preference wifiPreference = findPreference(KEY_TOGGLE_WIFI);
-        Preference btPreference = findPreference(KEY_TOGGLE_BLUETOOTH);
-        Preference wifiSettings = findPreference(KEY_WIFI_SETTINGS);
-        Preference vpnSettings = findPreference(KEY_VPN_SETTINGS);
-        Preference proxySetting = findPreference(KEY_PROXY_SETTING);
-        
-        IBinder b = ServiceManager.getService(BluetoothAdapter.BLUETOOTH_SERVICE);
-        if (b == null) {
-            // Disable BT Settings if BT service is not available.
-            Preference btSettings = findPreference(KEY_BT_SETTINGS);
-            btSettings.setEnabled(false);
-        }
+	private void initToggles() {
 
-        mWifiEnabler = new WifiEnabler(
-                this, (WifiManager) getSystemService(WIFI_SERVICE),
-                (CheckBoxPreference) wifiPreference);
-        mAirplaneModeEnabler = new AirplaneModeEnabler(
-                this, (CheckBoxPreference) airplanePreference);
-        mBtEnabler = new BluetoothEnabler(this, (CheckBoxPreference) btPreference);
+		Preference airplanePreference = findPreference(KEY_TOGGLE_AIRPLANE);
+		Preference wifiPreference = findPreference(KEY_TOGGLE_WIFI);
+		Preference btPreference = findPreference(KEY_TOGGLE_BLUETOOTH);
+		Preference wifiSettings = findPreference(KEY_WIFI_SETTINGS);
+		Preference vpnSettings = findPreference(KEY_VPN_SETTINGS);
+		Preference multilinkPref = findPreference(KEY_TOGGLE_MULTILINK);
 
-        // manually set up dependencies for Wifi if its radio is not toggleable in airplane mode
-        String toggleableRadios = Settings.System.getString(getContentResolver(),
-                Settings.System.AIRPLANE_MODE_TOGGLEABLE_RADIOS);
-        if (toggleableRadios == null || !toggleableRadios.contains(Settings.System.RADIO_WIFI)) {
-            wifiPreference.setDependency(airplanePreference.getKey());
-            wifiSettings.setDependency(airplanePreference.getKey());
-            vpnSettings.setDependency(airplanePreference.getKey());
-            proxySetting.setDependency(airplanePreference.getKey());
-        }
-        
-        mTetheringEnabler = new TetheringEnabler(
-        		this, (CheckBoxPreference) findPreference(KEY_TOGGLE_TETHERING));
-    }
+		IBinder b = ServiceManager
+				.getService(BluetoothAdapter.BLUETOOTH_SERVICE);
+		if (b == null) {
+			// Disable BT Settings if BT service is not available.
+			Preference btSettings = findPreference(KEY_BT_SETTINGS);
+			btSettings.setEnabled(false);
+		}
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch(requestCode) {
-        case REQUEST_CODE_EXIT_ECM:
-            Boolean isChoiceYes =
-                data.getBooleanExtra(EXIT_ECM_RESULT, false);
-            // Set Airplane mode based on the return value and checkbox state
-            mAirplaneModeEnabler.setAirplaneModeInECM(isChoiceYes,
-                    mAirplaneModePreference.isChecked());
-            break;
+		mWifiEnabler = new WifiEnabler(this,
+				(WifiManager) getSystemService(WIFI_SERVICE),
+				(CheckBoxPreference) wifiPreference);
+		mAirplaneModeEnabler = new AirplaneModeEnabler(this,
+				(CheckBoxPreference) airplanePreference);
+		mBtEnabler = new BluetoothEnabler(this,
+				(CheckBoxPreference) btPreference);
 
-        default:
-            break;
-        }
-    }
+		mMultiLinkEnabler = new MultiLinkEnabler(this,
+				(CheckBoxPreference) multilinkPref);
+
+		// manually set up dependencies for Wifi if its radio is not toggleable
+		// in airplane mode
+		String toggleableRadios = Settings.System.getString(
+				getContentResolver(),
+				Settings.System.AIRPLANE_MODE_TOGGLEABLE_RADIOS);
+		if (toggleableRadios == null
+				|| !toggleableRadios.contains(Settings.System.RADIO_WIFI)) {
+			wifiPreference.setDependency(airplanePreference.getKey());
+			wifiSettings.setDependency(airplanePreference.getKey());
+			vpnSettings.setDependency(airplanePreference.getKey());
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case REQUEST_CODE_EXIT_ECM:
+			Boolean isChoiceYes = data.getBooleanExtra(EXIT_ECM_RESULT, false);
+			// Set Airplane mode based on the return value and checkbox state
+			mAirplaneModeEnabler.setAirplaneModeInECM(isChoiceYes,
+					mAirplaneModePreference.isChecked());
+			break;
+
+		default:
+			break;
+		}
+	}
 
 }
